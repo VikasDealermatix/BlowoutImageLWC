@@ -57,6 +57,7 @@ export default class ProductCatalogView extends LightningElement {
                 if (result.length > 0) {
                     this.selectedItem = result[0];
                     this.fetchItemComponents(result[0].Id);
+                    this.otherItems = [];
                     this.clearNumbers();
                 } else {
                     this.selectedItem = null;
@@ -113,8 +114,6 @@ export default class ProductCatalogView extends LightningElement {
                         number: index + 1,
                         Quantity: 0
                     }));
-
-                    this.adjustCoordinates();
                 } else {
                     this.selectedItem = null;
                     this.otherItems = [];
@@ -126,7 +125,7 @@ export default class ProductCatalogView extends LightningElement {
                 this.showImageAndButtons = false;
                 console.error('Error:', error);
             });
-    }
+    }    
 
     handleImageLoad(event) {
         const img = event.target;
