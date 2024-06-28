@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>54.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Record Panel</masterLabel>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage">
+            <property name="title" type="String" label="Title" description="Title of the panel to be shown on top."/>
+            <property name="objectApiName" type="String" label="Object Api Name" description="Object Api Name to show records for."/>
+            <property name="recordFieldsetName" type="String" label="Record Fieldset" description="The fieldset to be used to show fields." /> 
+            <property name="defaultFieldValues" type="String" label="Default Field Values" description="The default values to pupulate record with." /> 
+            <event name="valuechanged" label="Value Changed" description="This event fires when a value is changed.">
+                <schema>
+                    {
+                        "type": "object",
+                        "properties": {
+                           "name": {
+                               "type": "string"
+                           },
+                           "value": {
+                                "type": "string"
+                            }
+                       }
+                    }
+                </schema>
+            </event>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
+        </targetConfig>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="title" type="String" label="Title" description="Title of the panel to be shown on top."/>
+            <property name="objectApiName" type="String" default="{!objectApiName}"></property>
+            <property name="recordFieldsetName" type="String" label="Record Fieldset" description="The fieldset to be used to show fields." /> 
+            <property name="defaultFieldValues" type="String" label="Default Field Values" description="The default values to pupulate record with." /> 
+        </targetConfig>
+
+        <targetConfig targets="lightning__RecordPage">
+            <property name="title" type="String" label="Title" description="Title of the panel to be shown on top."/>
+            <property name="objectApiName" type="String" default="{!objectApiName}"></property>
+            <property name="recordFieldsetName" type="String" label="Record Fieldset" description="The fieldset to be used to show fields." /> 
+            <property name="defaultFieldValues" type="String" label="Default Field Values" description="The default values to pupulate record with." /> 
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

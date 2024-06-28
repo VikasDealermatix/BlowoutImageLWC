@@ -1,0 +1,21 @@
+<template>
+    <div class="image-container">
+        <img src={imageUrl} alt="Sample Image" class="sample-image"/>
+    </div>
+    <div class="form-container">
+        <lightning-input label="Name" value={name} onchange={handleInputChange} data-id="name"></lightning-input>
+    </div>
+    <div class="output-container">
+        <p><strong>Name:</strong> {name}</p>
+    </div>
+    <div class="search-results">
+        <template if:true={items}>
+            <h3>Search Results:</h3>
+            <ul>
+                <template for:each={items} for:item="item">
+                    <li key={item.Id}>{item.Name}</li>
+                </template>
+            </ul>
+        </template>
+    </div>
+</template>
