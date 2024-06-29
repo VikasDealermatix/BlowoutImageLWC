@@ -5,7 +5,7 @@ public with sharing class ProductCatalogController {
             SELECT  Id, Name, dmpl__ItemCode__c, dmpl__ItemType__c, dmpl__ItemSubType__c, dmpl__ContractPostingTreatment__c, Brand__c,
                     M_R_P__c
             FROM dmpl__Item__c
-            WHERE Name LIKE :('%' + itemName + '%') LIMIT 6
+            WHERE Name LIKE :('%' + itemName + '%') LIMIT 3
         ];
     }
 
