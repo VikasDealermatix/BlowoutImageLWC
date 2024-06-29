@@ -9,6 +9,8 @@ import SALE_ORDER_LINE_OBJECT from '@salesforce/schema/dmpl__SaleOrderLine__c';
 import DMPL_SALE_ORDER_ID_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__SaleOrderId__c';
 import DMPL_ITEM_ID_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__ItemId__c';
 import DMPL_ITEM_QUANTITY_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__Quantity__c';
+import DMPL_UNIT_COST_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__UnitPrice__c';
+
 
 import REPAIR_ORDER_LINE_OBJECT from '@salesforce/schema/dmpl__RepairOrderLine__c';
 import DMPL_REPAIR_ORDER_ID_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__RepairOrderId__c';
