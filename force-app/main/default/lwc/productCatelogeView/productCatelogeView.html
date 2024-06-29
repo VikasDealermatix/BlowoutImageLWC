@@ -1,5 +1,6 @@
-<template>    
+<template>
     <div class="slds-box slds-box_x-small slds-grid slds-wrap" style="max-width: 800px; padding: 5px;">
+        
         <!-- Part 1: Search -->
         <lightning-card>
             <div class="slds-box slds-box_x-small slds-m-around_medium">
@@ -37,51 +38,58 @@
             </template>
         </lightning-card>
 
-        <!-- Part 2: Image and Cards -->
-        <div class="slds-col slds-size_1-of-1 slds-grid">
-
-            <template if:true={selectedItem}>
-                <!-- Image -->
-                <div class="slds-col slds-size_6-of-9 slds-box slds-box_x-small slds-m-around_medium">
-                    <div class="image-map-container" style="position: relative; max-height: 800px;">
-                        <img src={selectedItem.ImageUrl__c} usemap="#image-map" alt="Image Map" class="fixed-size-image" onload={handleImageLoad} style="width: 100%; height: auto;" ref="imageElement">
-                        <div class="number-container number" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
-                        <map name="image-map">
-                            <template for:each={otherItems} for:item="item" for:index="index">
-                                <area key={item.Id} shape="rect" alt={item.name} coords={item.resizedCoordinates} data-id={item.Id} onclick={handleAreaClick} />
-                            </template>
-                        </map>
-                    </div>
+        <!-- Part 2: Back Button, Image, and Cards -->
+        <template if:true={selectedItem}>
+            <div class="slds-col slds-size_1-of-1 slds-grid slds-wrap">
+                <!-- Back Button -->
+                <div class="slds-col slds-size_1-of-1 slds-m-around_medium">
+                    <lightning-button label="Back" onclick={handleBackTravel}></lightning-button>
                 </div>
-            
-                <!-- Cards -->
-                <div class="slds-col slds-size_3-of-9 slds-box slds-box_x-small slds-m-around_medium slds-grid">
-                    <div class="slds-col slds-size_1-of-1" ref="cardElement" style="overflow-y: auto;">
-                        <template for:each={otherItems} for:item="item" for:index="index">
-                            <div key={item.Id} class="item-card slds-box slds-box_x-small slds-m-bottom_small">
-                                <div class="slds-grid slds-wrap">
-                                    <div class="slds-col slds-size_1-of-1">
-                                        <div class="slds-grid slds-wrap slds-m-bottom_small">
-                                            <div class="slds-col slds-size_8-of-12 item-name">{item.number}. {item.name}</div>
-                                            <div class="slds-col slds-size_4-of-12 slds-text-align_right">
-                                                <lightning-button variant="brand" label="Add" class="small-add-button" data-id={item.Id} onclick={handleAddButtonClick}></lightning-button>
-                                            </div> 
-                                        </div>
-                                        <div class="item-mrp">Unit Cost: {item.mrp}</div>
-            
-                                        Quantity :
-                                            <div class="slds-col slds-size_1-of-1 slds-grid slds-wrap slds-justify_center quantity-buttons">
-                                                <lightning-button variant="destructive" class="tiny-button" label="-" data-id={item.Id} onclick={handleMinusQuantity}></lightning-button>
-                                                <lightning-button variant="neutral" class="tiny-button" label={item.Quantity} disabled></lightning-button>
-                                                <lightning-button variant="success" class="tiny-button" label="+" data-id={item.Id} onclick={handleAddQuantity}></lightning-button>
-                                            </div>
-                                    </div>
-                                </div>
+                
+                <!-- Image and Cards Container -->
+                    <div class="slds-grid slds-wrap slds-grid_align-center">
+                        <!-- Image -->
+                        <div class="slds-col slds-size_8-of-12 slds-box slds-box_x-small slds-m-around_medium">
+                            <div class="image-map-container" style="position: relative; max-height: 500px;">
+                                <img src={selectedItem.ImageUrl__c} usemap="#image-map" alt="Image Map" class="fixed-size-image" onload={handleImageLoad} style="width: 100%; height: auto;" ref="imageElement">
+                                <div class="number-container number" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+                                <map name="image-map">
+                                    <template for:each={otherItems} for:item="item" for:index="index">
+                                        <area key={item.Id} shape="rect" alt={item.name} coords={item.resizedCoordinates} data-id={item.Id} onclick={handleAreaClick} />
+                                    </template>
+                                </map>
                             </div>
-                        </template>
+                        </div>
+                
+                        <!-- Cards -->
+                        <div class="slds-col slds-size_4-of-12 slds-box slds-box_x-small slds-m-around_medium slds-grid">
+                            <div class="slds-col slds-size_1-of-1" ref="cardElement" style="overflow-y: auto;">
+                                <template for:each={otherItems} for:item="item" for:index="index">
+                                    <div key={item.Id} class="item-card slds-box slds-box_x-small slds-m-bottom_small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-col slds-size_1-of-1">
+                                                <div class="slds-grid slds-wrap slds-m-bottom_small">
+                                                    <div class="slds-col slds-size_8-of-12 item-name">{item.number}. {item.name}</div>
+                                                    <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                        <lightning-button variant="brand" label="Add" class="small-add-button" data-id={item.Id} onclick={handleAddButtonClick}></lightning-button>
+                                                    </div>
+                                                </div>
+                                                <div class="item-mrp">Unit Cost: {item.mrp}</div>
+                                                Quantity :
+                                                <div class="slds-col slds-size_1-of-1 slds-grid slds-wrap slds-justify_center quantity-buttons">
+                                                    <lightning-button variant="destructive" class="tiny-button" label="-" data-id={item.Id} onclick={handleMinusQuantity}></lightning-button>
+                                                    <lightning-button variant="neutral" class="tiny-button" label={item.Quantity} disabled></lightning-button>
+                                                    <lightning-button variant="success" class="tiny-button" label="+" data-id={item.Id} onclick={handleAddQuantity}></lightning-button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </template>        
-        </div>
+                
+            </div>
+        </template>
     </div>
 </template>

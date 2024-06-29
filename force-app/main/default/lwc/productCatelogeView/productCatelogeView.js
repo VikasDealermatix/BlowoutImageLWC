@@ -11,7 +11,6 @@ import DMPL_ITEM_ID_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__
 import DMPL_ITEM_QUANTITY_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__Quantity__c';
 import DMPL_UNIT_COST_FIELD from '@salesforce/schema/dmpl__SaleOrderLine__c.dmpl__UnitPrice__c';
 
-
 import REPAIR_ORDER_LINE_OBJECT from '@salesforce/schema/dmpl__RepairOrderLine__c';
 import DMPL_REPAIR_ORDER_ID_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__RepairOrderId__c';
 import DMPL_REPAIR_ITEM_ID_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__ItemId__c';
@@ -30,6 +29,8 @@ export default class ProductCatalogView extends LightningElement {
     @track selectedItem1;
     @track selectedItemComponents;
     @track showImageAndButtons = false; 
+    @track itemStack = [];
+    @track previous = '';
 
     @wire(getObjectInfo, { objectApiName: '$objectApiName' })
     objectInfo;
@@ -59,6 +60,7 @@ export default class ProductCatalogView extends LightningElement {
                 if (result.length > 0) {
                     this.selectedItem = result[0];
                     this.fetchItemComponents(result[0].Id);
+                    this.otherItems = [];
                     this.clearNumbers();
                 } else {
                     this.selectedItem = null;
@@ -79,6 +81,8 @@ export default class ProductCatalogView extends LightningElement {
         console.log('Item clicked:', itemId);
         this.selectedItem = this.items.find(item => item.Id === itemId);
         this.searchKey = this.selectedItem.Name;
+        this.items = [];
+        this.itemStack.push(itemId);
         this.fetchItemDetails(itemId);
     }
 
@@ -95,6 +99,7 @@ export default class ProductCatalogView extends LightningElement {
     }
 
     fetchItemDetails(itemId) {
+        console.log("Inside fetch details");
         getItemComponentsByItemId({ itemId })
             .then(result => {
                 if (result && result.length > 0) {
@@ -115,8 +120,6 @@ export default class ProductCatalogView extends LightningElement {
                         number: index + 1,
                         Quantity: 0
                     }));
-
-                    this.adjustCoordinates();
                 } else {
                     this.selectedItem = null;
                     this.otherItems = [];
@@ -128,7 +131,7 @@ export default class ProductCatalogView extends LightningElement {
                 this.showImageAndButtons = false;
                 console.error('Error:', error);
             });
-    }
+    }    
 
     handleImageLoad(event) {
         const img = event.target;
@@ -177,6 +180,8 @@ export default class ProductCatalogView extends LightningElement {
 
         this.selectedItem = this.otherItems.find(item => item.Id === itemId);
         this.searchKey = this.selectedItem.name;
+
+        this.itemStack.push(itemId);
         this.fetchItemDetails(itemId);
     }
 
@@ -249,51 +254,64 @@ export default class ProductCatalogView extends LightningElement {
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
-                        message: 'Sale Order Line created successfully',
-                        variant: 'success',
-                    }),
+                        message: `Sale Order Line for ${item.name} created successfully`,
+                        variant: 'success'
+                    })
                 );
             })
             .catch(error => {
                 this.dispatchEvent(
                     new ShowToastEvent({
-                        title: 'Error',
-                        message: 'Error adding item to Sale Order',
-                        variant: 'error',
-                    }),
+                        title: 'Error creating Sale Order Line',
+                        message: error.body.message,
+                        variant: 'error'
+                    })
                 );
-                console.error('Error adding item to Sale Order:', error);
             });
     }
 
-    createRepairOrderLine(itemId, Item) {
+    createRepairOrderLine(itemId, item) {
         const fields = {};
- 
         fields[DMPL_REPAIR_ORDER_ID_FIELD.fieldApiName] = this.recordId;
         fields[DMPL_REPAIR_ITEM_ID_FIELD.fieldApiName] = itemId;
-        fields[DMPL_REPAIR_ITEM_QUANTITY_FIELD.fieldApiName] = Item.Quantity;
-        console.log("Here : ",Item.Quantity);
- 
-        const recordInput = {apiName : REPAIR_ORDER_LINE_OBJECT.objectApiName, fields};
+        fields[DMPL_REPAIR_ITEM_QUANTITY_FIELD.fieldApiName] = item.Quantity;
+
+        const recordInput = { apiName: REPAIR_ORDER_LINE_OBJECT.objectApiName, fields };
+
         createRecord(recordInput)
-        .then(repairOrderLine => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Success',
-                    message: 'Repair Order Line created successfully',
-                    variant: 'success'
-                })
-            );
-            console.log('Created Repair Order Line:', repairOrderLine);
-        }).catch(error => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error creating record',
-                    message: error.body.message,
-                    variant: 'error'
-                })
-            );
-            console.error('Error creating record:', error);
-        });      
+            .then(() => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: `Repair Order Line for ${item.name} created successfully`,
+                        variant: 'success'
+                    })
+                );
+            })
+            .catch(error => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error creating Repair Order Line',
+                        message: error.body.message,
+                        variant: 'error'
+                    })
+                );
+            });
+    }
+
+    handleBackTravel() {
+        if (this.itemStack.length > 1) {
+            this.itemStack.pop();
+            const previousItemId = this.itemStack[this.itemStack.length - 1];
+            this.fetchItemDetails(previousItemId);
+            this.searchKey = this.items.find(item => item.Id === previousItemId)?.Name || '';
+        } else {
+            // Reset to initial state if no previous item in stack
+            this.searchKey = '';
+            this.selectedItem = null;
+            this.selectedItemComponents = null;
+            this.otherItems = [];
+            this.clearNumbers();
+        }
     }
 }
