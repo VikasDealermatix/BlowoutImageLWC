@@ -15,6 +15,7 @@ import REPAIR_ORDER_LINE_OBJECT from '@salesforce/schema/dmpl__RepairOrderLine__
 import DMPL_REPAIR_ORDER_ID_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__RepairOrderId__c';
 import DMPL_REPAIR_ITEM_ID_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__ItemId__c';
 import DMPL_REPAIR_ITEM_QUANTITY_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__Quantity__c';
+import DMPL_REPAIR_ITEM_UnitCost_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__UnitPrice__c';
 
 export default class ProductCatalogView extends LightningElement {
     @track selectedItem;
@@ -161,9 +162,9 @@ export default class ProductCatalogView extends LightningElement {
             const coords = item.coordinates.split(',').map(coord => parseInt(coord, 10));
 
             const adjustedCoords = coords.map((coord, index) => {
-                if (index % 2 === 0) { // x coordinate
+                if (index % 2 === 0) { 
                     return Math.round((coord / this.originalWidth) * currentWidth);
-                } else { // y coordinate
+                } else { 
                     return Math.round((coord / this.originalHeight) * currentHeight);
                 }
             }).join(',');
@@ -245,6 +246,7 @@ export default class ProductCatalogView extends LightningElement {
         fields[DMPL_SALE_ORDER_ID_FIELD.fieldApiName] = this.recordId;
         fields[DMPL_ITEM_ID_FIELD.fieldApiName] = itemId;
         fields[DMPL_ITEM_QUANTITY_FIELD.fieldApiName] = item.Quantity;
+        // fields[DMPL_UNIT_COST_FIELD.fieldApiName] = item.Quantity;
         console.log("Here",item.Quantity);
 
         const recordInput = { apiName: SALE_ORDER_LINE_OBJECT.objectApiName, fields };
@@ -275,6 +277,7 @@ export default class ProductCatalogView extends LightningElement {
         fields[DMPL_REPAIR_ORDER_ID_FIELD.fieldApiName] = this.recordId;
         fields[DMPL_REPAIR_ITEM_ID_FIELD.fieldApiName] = itemId;
         fields[DMPL_REPAIR_ITEM_QUANTITY_FIELD.fieldApiName] = item.Quantity;
+        fields[DMPL_REPAIR_ITEM_UnitCost_FIELD.fieldApiName] = item.mrp;
 
         const recordInput = { apiName: REPAIR_ORDER_LINE_OBJECT.objectApiName, fields };
 
@@ -306,7 +309,6 @@ export default class ProductCatalogView extends LightningElement {
             this.fetchItemDetails(previousItemId);
             this.searchKey = this.items.find(item => item.Id === previousItemId)?.Name || '';
         } else {
-            // Reset to initial state if no previous item in stack
             this.searchKey = '';
             this.selectedItem = null;
             this.selectedItemComponents = null;
