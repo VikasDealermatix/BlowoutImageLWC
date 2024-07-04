@@ -2,6 +2,7 @@ import { LightningElement, track, api, wire } from 'lwc';
 import { createRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { NavigationMixin } from 'lightning/navigation';
 import getItemComponentsByItemId from '@salesforce/apex/ProductCatalogController.getItemComponentsByItemId';
 import getItemsByName from '@salesforce/apex/ProductCatalogController.getItemsByName';
 
@@ -17,7 +18,7 @@ import DMPL_REPAIR_ITEM_ID_FIELD from '@salesforce/schema/dmpl__RepairOrderLine_
 import DMPL_REPAIR_ITEM_QUANTITY_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__Quantity__c';
 import DMPL_REPAIR_ITEM_UnitCost_FIELD from '@salesforce/schema/dmpl__RepairOrderLine__c.dmpl__UnitPrice__c';
 
-export default class ProductCatalogView extends LightningElement {
+export default class ProductCatalogView extends NavigationMixin(LightningElement){
     @track selectedItem;
     @track otherItems = [];
     originalWidth;
@@ -35,7 +36,7 @@ export default class ProductCatalogView extends LightningElement {
 
     @wire(getObjectInfo, { objectApiName: '$objectApiName' })
     objectInfo;
-   
+    
     get objectLabel() {
         return this.objectInfo?.data?.label || 'Object';
     }
@@ -185,7 +186,7 @@ export default class ProductCatalogView extends LightningElement {
         this.itemStack.push(itemId);
         this.fetchItemDetails(itemId);
     }
-
+    
     positionNumbers() {
         const numberContainer = this.template.querySelector('.number-container');
         numberContainer.innerHTML = '';
@@ -246,6 +247,7 @@ export default class ProductCatalogView extends LightningElement {
         fields[DMPL_SALE_ORDER_ID_FIELD.fieldApiName] = this.recordId;
         fields[DMPL_ITEM_ID_FIELD.fieldApiName] = itemId;
         fields[DMPL_ITEM_QUANTITY_FIELD.fieldApiName] = item.Quantity;
+        // fields[DMPL_REPAIR_ITEM_UnitCost_FIELD.fieldApiName] = item.mrp;
         // fields[DMPL_UNIT_COST_FIELD.fieldApiName] = item.Quantity;
         console.log("Here",item.Quantity);
 
@@ -315,5 +317,48 @@ export default class ProductCatalogView extends LightningElement {
             this.otherItems = [];
             this.clearNumbers();
         }
+    }
+
+    handleWheel(event) {
+        event.preventDefault();
+    
+        const img = this.template.querySelector('.fixed-size-image');
+        let scale = parseFloat(img.getAttribute('data-scale')) || 1;
+        scale += event.deltaY * -0.01;
+    
+        const minScale = 1;
+        const maxScale = 3;
+        scale = Math.min(Math.max(minScale, scale), maxScale);
+    
+        const rect = img.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const offsetY = event.clientY - rect.top;
+    
+        const originX = (offsetX / rect.width) * 100;
+        const originY = (offsetY / rect.height) * 100;
+    
+        img.style.transformOrigin = `${originX}% ${originY}%`;
+        img.style.transform = `scale(${scale})`;
+        img.setAttribute('data-scale', scale);
+    }
+
+    navigateToRecordPage(recordId, objectApiname) {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: recordId,
+                objectApiName : objectApiname,
+                actionName: 'view'
+            }
+        });
+
+        console.log("record : ", recordId);
+        console.log("object : ", objectApiname);
+    }
+
+    disconnectedCallback() {
+        console.log('Component is being removed from the DOM');
+        // this.navigateToRecordPage(this.recordId,this.objectApiName);
+        eval("$A.get('e.force:refreshView').fire();");
     }
 }

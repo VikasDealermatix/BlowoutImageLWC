@@ -48,6 +48,30 @@ public with sharing class ProductCatalogController {
         return itemComponents;
     }
 
+    // Vikas Kare
+    @AuraEnabled
+    public static void refreshSaleOrderLine(String saleOrderId) {
+
+        // No need to add anything here Okay
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<dmpl__SaleOrderLine__c> getSaleOrderLineByOrderId(String saleOrderId) {
+
+        return [
+            SELECT Id,
+            Name, 
+            dmpl__ItemId__c, 
+            dmpl__Quantity__c, 
+            dmpl__UnitPrice__c
+            FROM dmpl__SaleOrderLine__c
+            WHERE dmpl__SaleOrderId__c = :saleOrderId
+        ];
+    }
+
+
+    // Vikas Kare
+
     public class ItemComponentWrapper {
         @AuraEnabled public Id      id;
         @AuraEnabled public String  name;

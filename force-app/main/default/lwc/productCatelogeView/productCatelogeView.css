@@ -4,6 +4,20 @@
     max-height: 500px;
 }
 
+.image-map-container {
+    position: relative;
+   /* / max-width: calc(100%  425px);  */
+    max-height: 500px; 
+    overflow: hidden;
+}
+
+.slds-size_3-of-9 {
+    position: relative;
+    max-width: 425px;
+    height: 100%;
+    overflow-y: auto;
+}
+
 .search-result-item {
     padding: 8px;
     border: 1px solid #ccc;
